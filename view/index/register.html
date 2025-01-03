@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preload" href="/static/a34f9d1faa5f3315-s.p.woff2" as="font" crossorigin="" type="font/woff2" />
+  <link rel="preload" as="image" href="/image/logo.png" />
+  <link rel="preload" as="image"
+    href="https://zknown-1251007641.cos.ap-guangzhou.myqcloud.com/images/20240130090120.png" />
+  <link rel="preload" as="image" href="/image/hb_bottom.png" />
+  <link rel="stylesheet" href="/assets/css/login.css" data-precedence="next" />
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-L50J0T914F"></script>
+  <!-- jquery -->
+  <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-2-M/jquery/3.5.1/jquery.min.js"
+    type="application/javascript"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- toastr提示插件 -->
+  <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <link rel="icon" href="/favicon.ico" />
+  <title>AI 红包封面生成器 ｜ AI Cover</title>
+  <meta name="description" content="AI 红包封面生成器，利用 AI 技术生成高清精美的微信红包封面图片。" />
+  <meta name="keywords" content="AI 红包封面生成器, 微信红包封面, 微信红包, AI 红包封面, AI Cover" />
+  <link rel="canonical" href="http://dev.aicovers.com" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="128x128" />
+  <meta name="next-size-adjust" />
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-L50J0T914F");
+  </script>
+</head>
+
+<body class="" monica-id="ofpnmcalabcbjgholdjcjblkibolbppb" monica-version="7.4.2">
+  <div class="signin">
+    <form method="post" enctype="multipart/form-data">
+      <div class="signin_part">
+        <div class="signin_title">
+          <h1>Sign up</h1>
+        </div>
+        <div class="accout">
+          <label for="name">账号:</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div class="password">
+          <label for="password">密码:</label>
+          <input type="password" id="password" name="password" required style="display: inline-block; width: 58%" />
+          <button type="button" id="togglePassword" class="btn btn-link">
+            显示密码
+          </button>
+        </div>
+        <div class="confirmpassword">
+          <label for="confirmpassword">确认密码:</label>
+          <input style="width: 52%" type="password" id="confirmpassword" name="confirmpassword" required />
+          <button type="button" id="toggleconfirm" class="btn btn-link">
+            显示密码
+          </button>
+        </div>
+
+        <input class="submit" id="register" type="submit" value="注册" />
+
+        <div class="logs">
+          No account?
+          <a href="/login">Sign up</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>
+<script>
+  $("#togglePassword").click(function () {
+    var $passwordInput = $("#password");
+    if ($passwordInput.attr("type") === "password") {
+      $passwordInput.attr("type", "text");
+      $(this).text("隐藏密码");
+    } else {
+      $passwordInput.attr("type", "password");
+      $(this).text("显示密码");
+    }
+  });
+
+  $("#toggleconfirm").click(function () {
+    var $passwordInput = $("#confirmpassword");
+    if ($passwordInput.attr("type") === "password") {
+      $passwordInput.attr("type", "text");
+      $(this).text("隐藏密码");
+    } else {
+      $passwordInput.attr("type", "password");
+      $(this).text("显示密码");
+    }
+  });
+
+  $(document).on("click", "#register", function (e) {
+    e.preventDefault();
+    var name = $("#name").val();
+    var password = $("#password").val();
+    var confirmPassword = $("#confirmpassword").val();
+
+    if (!name || !password || !confirmpassword) {
+      toastr.error("请先填写账号或者密码与确认密码");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toastr.error("密码与确认密码不一致，请重新输入");
+      $("#password, #confirmpassword").val("");
+      return;
+    }
+
+    $.ajax({
+      type: "POST",
+      url: "/register",
+      data: {
+        name: name,
+        password: password,
+      },
+      success: function (response) {
+        if (response.code) {
+          toastr.success(response.message);
+          setTimeout(function () {
+            window.location.href = "/";
+          }, 2000);
+        } else {
+          toastr.error(response.message);
+        }
+      },
+      error: function (xhr, status, error) {
+        toastr.error("注册请求失败，请稍后再试");
+      },
+    });
+  });
+</script>

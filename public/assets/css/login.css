@@ -1,0 +1,57 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+input {
+  border: 1px solid #cccccc;
+  width: 80%;
+  border-radius: 5px;
+  padding: 2%;
+}
+
+input:focus {
+  border: 1px solid #cccccc !important;
+}
+
+.signin {
+  width: 100%;
+}
+
+.signin_part {
+  width: 30%;
+  box-shadow: 5px 5px 8px 10px #e5e7eb;
+  margin: 5% auto;
+  border: 1px solid #e5e7eb;
+  padding: 5%;
+}
+
+.signin_title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.accout,
+.password,
+.confirmpassword,
+.logs {
+  margin: 14px 0;
+}
+
+.submit {
+  width: 40%;
+  background-color: #0d33bf;
+  margin: 0 32%;
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 2%;
+  cursor: pointer;
+}
+
+#togglePassword {
+  margin-left: 10px;
+  cursor: pointer;
+  display: inline-block;
+}
