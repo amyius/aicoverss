@@ -99,8 +99,9 @@
               <div class="mx-auto max-w-7xl px-5 py-4 md:px-10 md:py-24">
                 <div class="grid grid-cols-1 items-center gap-8 sm:gap-20 lg:grid-cols-2">
                   <a href="javascript:void(0)" class="relative overflow-hidden max-w-[280px] mx-auto cursor-pointer">
-                    <img alt="{$listdetail.describe}" loading="lazy" width="280" height="420" decoding="async"
-                      data-nimg="1" class="w-full rounded-lg" style="color: transparent" src="{$listdetail.img}" />
+                    <img alt="{$listdetail.describes}" loading="lazy" width="280" height="420" decoding="async"
+                      id="imageToDownload" data-nimg="1" class="w-full rounded-lg" style="color: transparent"
+                      src="{$listdetail.img}" />
                     <img src="/image/hb_bottom.png" class="absolute bottom-0" alt="" /></a>
                   <div class="sm:max-w-sm md:max-w-md lg:max-w-lg">
                     <a href="/user/bcbf9857-60e3-4c59-a892-44d0dfae40c7/covers" class="group block flex-shrink-0">
@@ -119,10 +120,10 @@
                       </div>
                     </a>
                     <p class="mt-4 mb-6 max-w-md text-[#636262] md:mb-10 lg:mb-12">
-                      "<!-- -->{$listdetail.describe}<!-- -->"
+                      "<!-- -->{$listdetail.describes}<!-- -->"
                     </p>
                     <div class="text-sm text-[#636262] text-left">
-                      <a>
+                      <a id="downloads">
                         <button
                           class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-4 mx-auto">
                           <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512"
@@ -161,7 +162,7 @@
                     {foreach name="list" id="item"}
                     <a href="/detail/{$item->packetid}"
                       class="relative overflow-hidden max-w-[280px] mx-auto cursor-pointer">
-                      <img alt="{$item->describe}" loading="lazy" width="280" height="420" decoding="async"
+                      <img alt="{$item->describes}" loading="lazy" width="280" height="420" decoding="async"
                         data-nimg="1" class="w-full rounded-lg" style="color:transparent" src="{$item->img}">
                       <img src="/image/hb_bottom.png" class="absolute bottom-0" alt="">
                     </a>
@@ -853,7 +854,7 @@
       type: "POST",
       url: `/detail/${id}`,
       success: function (response) {
-        console.log("nnn", response);
+        console.log("nnn", 请求成功);
       },
       error: function (xhr, status, error) {
         console.log("登录请求失败，请稍后再试");
@@ -867,6 +868,19 @@
       }, 2000);
     });
 
+    //下载封面
+    $('#downloads').click(function () {
+
+      var imageSrc = $('#imageToDownload').attr('src');
+
+      var a = document.createElement('a');
+      a.href = imageSrc;
+      a.download = 'image.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
+
     //分享
     $('#shareButton').click(function (e) {
       e.preventDefault();
@@ -875,7 +889,9 @@
   });
 
   function shareWithFriends() {
-    var shareUrl = "https://aicover.design/cover/b5eb3007-7563-4761-b202-2bf6026539a3";
+    var url = window.location.href;
+    var urlObj = new URL(url);
+    var shareUrl = urlObj.href;
     var shareTitle = "分享好友";
     var shareContent = "我做了一个好看的 AI 红包封面🧧，分享给你👉";
 
@@ -886,15 +902,16 @@
         a.firstChild.click();
         document.body.removeChild(a);
     })();void(0);`;
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(shareContent + " " + shareUrl).then(function () {
-        console.log('内容已复制到剪贴板');
-      }).catch(err => {
-        console.error('无法复制内容: ', err);
-      });
+    if (document.execCommand) {
+      var textarea = document.createElement('textarea');
+      textarea.value = shareContent + " " + shareUrl;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      toastr.success('内容已复制到剪贴板,可以去任意地方粘贴，分享给好友');
     } else {
-      fallbackCopyTextToClipboard(shareContent + " " + shareUrl);
+      toastr.error('浏览器不支持复制操作，请手动复制内容：' + shareContent + " " + shareUrl);
     }
   }
 

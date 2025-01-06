@@ -17,7 +17,7 @@ class Index extends BaseController
         $list = Redpacket::where('type', $type);
         if ($params) {
             if ($describe) {
-                $list->where('describe', 'like', $describe . '%');
+                $list->where('describes', 'like', $describe . '%');
             }
             $list = $list->select();
             return json(['lists' => $list]);

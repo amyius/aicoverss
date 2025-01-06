@@ -113,7 +113,7 @@
                         {foreach name="lists" id="item"}
                         <a href="/detail/{$item->packetid}"
                             class="relative overflow-hidden max-w-[280px] mx-auto cursor-pointer">
-                            <img alt="{$item->describe}" loading="lazy" width="280" height="420" decoding="async"
+                            <img alt="{$item->describes}" loading="lazy" width="280" height="420" decoding="async"
                                 data-nimg="1" class="w-full rounded-lg" style="color:transparent" src="{$item->img}">
                             <img src="/image/hb_bottom.png" class="absolute bottom-0" alt="">
                         </a>
@@ -797,9 +797,15 @@
         $('#latest, #hot, #random').on('click', function (e) {
             e.preventDefault();
 
+            $("#latest, #hot, #random")
+                .removeClass("border-primary text-primary")
+                .addClass("border-transparent text-gray-500");
+            $(this)
+                .addClass("border-primary text-primary")
+                .removeClass("border-transparent text-gray-500");
+
             var type = $(this).attr('id');
             var typeValue = 1;
-            console.log('kkk', type);
 
             if (type === 'latest') {
                 typeValue = 1;
@@ -819,7 +825,7 @@
                     $.each(response.lists, function (index, item) {
                         var packetHtml = `
                         <a href="/detail/${item.packetid}" class="relative overflow-hidden max-w-[280px] mx-auto cursor-pointer">
-                            <img alt="${item.describe}" loading="lazy" width="280" height="420" decoding="async" data-nimg="1" class="w-full rounded-lg" style="color:transparent" src="${item.img}">
+                            <img alt="${item.describes}" loading="lazy" width="280" height="420" decoding="async" data-nimg="1" class="w-full rounded-lg" style="color:transparent" src="${item.img}">
                             <img src="/image/hb_bottom.png" class="absolute bottom-0" alt="">
                         </a>
                     `;
@@ -833,41 +839,62 @@
         });
     });
     $('#search').click(function () {
-        var userid = localStorage.getItem('userid') ? localStorage.getItem('userid') : 0;
-        if (userid) {
-            var value = $('#searchvalue').val();
-            console.log('ooo', value);
-            $.ajax({
-                type: "GET",
-                url: "/index",
-                data: {
-                    describe: value
-                },
-                success: function (response) {
-                    console.log("nnn", response);
-                    $('#packet_list').empty();
+        $.ajax({
+            type: "POST",
+            url: "/Redpackets/redpackter",
+            data: {
+                prompt: $('#searchvalue').val()
+            },
+            success: function (response) {
+                console.log("nnn", 请求成功);
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log("登录请求失败，请稍后再试");
+            },
+        });
 
-                    $.each(response.lists, function (index, item) {
-                        var packetHtml = `
+    });
+
+    $('#search').on('keydown', function (event) {
+        console.log('uuu',event);
+        if (event.key === 'Enter') {
+            console.log('mmm');
+            var userid = localStorage.getItem('userid') ? localStorage.getItem('userid') : 0;
+            if (userid) {
+                var value = $('#searchvalue').val();
+                console.log('ooo', value);
+                $.ajax({
+                    type: "GET",
+                    url: "/index",
+                    data: {
+                        describe: value
+                    },
+                    success: function (response) {
+                        console.log("nnn", response);
+                        $('#packet_list').empty();
+
+                        $.each(response.lists, function (index, item) {
+                            var packetHtml = `
                         <a href="/detail/${item.packetid}" class="relative overflow-hidden max-w-[280px] mx-auto cursor-pointer">
-                            <img alt="${item.describe}" loading="lazy" width="280" height="420" decoding="async" data-nimg="1" class="w-full rounded-lg" style="color:transparent" src="${item.img}">
+                            <img alt="${item.describes}" loading="lazy" width="280" height="420" decoding="async" data-nimg="1" class="w-full rounded-lg" style="color:transparent" src="${item.img}">
                             <img src="/image/hb_bottom.png" class="absolute bottom-0" alt="">
                         </a>
                     `;
-                        $('#packet_list').append(packetHtml);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.log("登录请求失败，请稍后再试");
-                },
-            });
-        } else {
-            toastr.error('请先登录');
-            setTimeout(function () {
-                window.location.href = "/login";
-            }, 2000);
+                            $('#packet_list').append(packetHtml);
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("登录请求失败，请稍后再试");
+                    },
+                });
+            } else {
+                toastr.error('请先登录');
+                setTimeout(function () {
+                    window.location.href = "/login";
+                }, 2000);
+            }
         }
-
     });
 
 </script>
