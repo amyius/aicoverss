@@ -15,6 +15,7 @@ Route::group('', function () {
     Route::any('/login', 'index/login');
     Route::any('/register', 'index/register');
     Route::any('/detail/:id', 'index/detail');
+    Route::any('/temporary', 'index/temporary');
 });
 
 // http://dev.aicovers.com/aicover/aicover

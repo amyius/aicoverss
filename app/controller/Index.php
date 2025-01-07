@@ -23,7 +23,8 @@ class Index extends BaseController
             return json(['lists' => $list]);
         }
         $list = $list->select();
-        return view('index', ['lists' => $list]);
+        $count = Redpacket::count();
+        return view('index', ['lists' => $list, 'count' => $count]);
     }
 
 
@@ -79,5 +80,10 @@ class Index extends BaseController
         }
 
         return view('register');
+    }
+
+    public function temporary()
+    {
+        return view('temporary');
     }
 }
