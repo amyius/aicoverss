@@ -840,20 +840,29 @@
         });
     });
     $('#search').click(function () {
-        $.ajax({
-            type: "POST",
-            url: "/Redpackets/redpackter",
-            data: {
-                prompt: $('#searchvalue').val()
-            },
-            success: function (response) {
-                console.log("请求成功");
-                window.location.reload();
-            },
-            error: function (xhr, status, error) {
-                console.log("登录请求失败，请稍后再试");
-            },
-        });
+        const userid = localStorage.getItem('userid') || 0;
+        if (userid !== 0) {
+            $.ajax({
+                type: "POST",
+                url: "/Redpackets/redpackter",
+                data: {
+                    prompt: $('#searchvalue').val()
+                },
+                success: function (response) {
+                    console.log("请求成功");
+                    window.location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.log("登录请求失败，请稍后再试");
+                },
+            });
+        } else {
+            toastr.error('请先登录');
+            setTimeout(function () {
+                window.location.href = "/login";
+            }, 2000);
+        }
+
 
     });
 
