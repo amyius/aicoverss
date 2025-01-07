@@ -792,7 +792,7 @@
             var confirmAction = toastr.error(退出成功, "登录失败", { timeOut: 0 });
             setTimeout(function () {
                 window.location.href = "/";
-            }, 2000);
+            }, 2500);
         });
 
         $('#latest, #hot, #random').on('click', function (e) {
@@ -872,10 +872,10 @@
             if (userid !== 0) {
                 const value = $('#searchvalue').val();
                 console.log('ooo', value);
-                if (value.trim() === '') {
-                    toastr.error('请输入搜索内容');
-                    return;
-                }
+                // if (value.trim() === '') {
+                //     toastr.error('请输入搜索内容');
+                //     return;
+                // }
                 $.ajax({
                     type: "GET",
                     url: "/index",
@@ -905,7 +905,7 @@
                 toastr.error('请先登录');
                 setTimeout(function () {
                     window.location.href = "/login";
-                }, 2000);
+                }, 2500);
             }
         }
     });

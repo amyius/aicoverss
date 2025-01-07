@@ -70,7 +70,7 @@ class Redpackets extends BaseController
             // ];
             // $sus = Generatedtask::Insert($data);
             if ($res) {
-                $img = $this->generateImageRedPacket($res['JobId']);
+                $img = $this->generateImageRedPacket($res['JobId'], $prompt);
                 return [
                     'code' => 1,
                     'message' => '成功',
@@ -88,7 +88,7 @@ class Redpackets extends BaseController
         }
     }
 
-    private function generateImageRedPacket($jobid)
+    private function generateImageRedPacket($jobid, $prompt)
     {
         try {
             // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
@@ -124,12 +124,12 @@ class Redpackets extends BaseController
                 $jobStatusCode = $res['JobStatusCode'];
                 if ($jobStatusCode == 5) {
                     $imageUrl = $res['ResultImage'][0];
-                    $localPath = public_path() . '/image/' . time() . '.jpg';
+                    $localPath = public_path() . '/image/' . time() . '.png';
                     $relativePath = $this->downloadImageToLocal($imageUrl, $localPath);
                     if ($relativePath) {
                         $data = [
                             'img' => $relativePath,
-                            'describes' => $res['RevisedPrompt'][0],
+                            'describes' => $prompt,
                             'created_at' => date('Y-m-d H:i:s')
                         ];
                         $sus = Redpacket::Insert($data);

@@ -100,18 +100,18 @@
         userid: userid
       },
       success: function (response) {
-        console.log("nnn", response);
+        console.log("请求成功");
 
         if (response.code) {
           toastr.success(response.message);
           setCache('userid', response.data);
           window.location.href = "/";
         } else {
-          var confirmAction = toastr.error(response.message, "登录失败", { timeOut: 0 });
+          var confirmAction = toastr.error(response.message);
           setTimeout(function () {
             $("#name").val('');
             $("#password").val('');
-          }, 2000);
+          }, 2500);
         }
       },
       error: function (xhr, status, error) {
