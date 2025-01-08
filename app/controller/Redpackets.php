@@ -20,7 +20,7 @@ class Redpackets extends BaseController
     {
         $params = $this->request->param();
         $prompt = isset($params['prompt']) ? trim($params['prompt']) : '';
-        $user_id = isset($params['user_id']) ? trim($params['user_id']) : 0;
+        $user_id = isset($params['userid']) ? trim($params['userid']) : 0;
 
         // 调用腾讯混元模型生成封面红包设计方案
         $result = $this->generateCoverRedPacket($prompt, $user_id);
