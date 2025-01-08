@@ -107,15 +107,9 @@
                     <a href="/user/bcbf9857-60e3-4c59-a892-44d0dfae40c7/covers" class="group block flex-shrink-0">
                       <div class="flex items-center">
                         <div>
-                          <span
-                            class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full cursor-pointer"><img
-                              class="aspect-square h-full w-full" alt="{$listdetail.meaning}"
-                              src="https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18ybTlOcGNpRWFIMkdpM1FkdTZNdHVsT1JKQjQifQ" /></span>
-                        </div>
-                        <div class="ml-3">
-                          <p class="text-lg font-medium text-gray-700 group-hover:text-gray-900">
-                            {$listdetail.meaning}
-                          </p>
+                          <span class="relative flex h-10  shrink-0  rounded-full cursor-pointer username">
+                            <div class="names">未知用户</div>
+                          </span>
                         </div>
                       </div>
                     </a>
@@ -833,11 +827,16 @@
 <script>
 
   $('document').ready(function () {
-    var userid = localStorage.getItem('userid') ? localStorage.getItem('userid') : 0;
+    var userinfo = JSON.parse(localStorage.getItem('userinfo')) ? JSON.parse(localStorage.getItem('userinfo')) : 0;
+    const userid = userinfo.id ? userinfo.id : 0;
+    const username = userinfo.name ? userinfo.name : '未知用户';
+    console.log('username', username);
+
     //登录与注销按钮显示
     if (userid) {
       $('#logins').css('display', 'none');
       $('#logout').css('display', 'block');
+      $('.username div').text(username);
     }
     else {
       $('#logins').css('display', 'block');
@@ -851,7 +850,7 @@
     var id = pathParts[pathParts.length - 1];
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: `/detail/${id}`,
       success: function (response) {
         console.log('请求成功');
@@ -862,10 +861,11 @@
     });
     //注销
     $('#logout').click(function () {
+      toastr.success('已注销, 即将跳转登录页');
       localStorage.clear();
       setTimeout(function () {
         window.location.href = "/";
-      }, 2000);
+      }, 2500);
     });
 
     //下载封面
@@ -941,3 +941,18 @@
   }
 
 </script>
+<style>
+  .username {
+    height: 4rem;
+    border-radius: 50%;
+    background-color: #004e3f;
+    color: #ffffff;
+    width: 4rem;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .names {
+    margin: 0 auto;
+  }
+</style>

@@ -90,7 +90,8 @@
       toastr.error("请先填写账号或者密码");
       return;
     }
-    var userid = localStorage.getItem('userid') ? localStorage.getItem('userid') : 0;
+    var userinfo = JSON.parse(localStorage.getItem('userinfo')) ? JSON.parse(localStorage.getItem('userinfo')) : 0;
+    var userid = userinfo.id ? userinfo.id : 0;
     $.ajax({
       type: "POST",
       url: "/login",
@@ -100,11 +101,11 @@
         userid: userid
       },
       success: function (response) {
-        console.log("请求成功");
+        console.log("请求成功", response);
 
         if (response.code) {
           toastr.success(response.message);
-          setCache('userid', response.data);
+          setCache('userinfo', response.data);
           window.location.href = "/";
         } else {
           var confirmAction = toastr.error(response.message);

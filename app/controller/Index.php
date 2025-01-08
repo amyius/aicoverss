@@ -50,8 +50,9 @@ class Index extends BaseController
             $user = User::where('name', $query['name'])->find();
             $inputPassword = strtolower($query['password']);
             if ($user && $inputPassword == strtolower($user['password'])) {
-                Session::set('user_id', $user['id']);
-                return json(['code' => 1, 'message' => '登录成功', 'data' => $user['id']], 200);
+                $data = ['id' => $user['id'], 'name' => $user['name']];
+                Session::set('userinfo', $data);
+                return json(['code' => 1, 'message' => '登录成功', 'data' => $data], 200);
             } else {
                 return json(['code' => 0, 'message' => '登录失败，账号或者密码错误', 'data' => 0], 401);
             }
