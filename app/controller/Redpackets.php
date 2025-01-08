@@ -20,15 +20,16 @@ class Redpackets extends BaseController
     {
         $params = $this->request->param();
         $prompt = isset($params['prompt']) ? trim($params['prompt']) : '';
+        $user_id = isset($params['user_id']) ? trim($params['user_id']) : 0;
 
         // 调用腾讯混元模型生成封面红包设计方案
-        $result = $this->generateCoverRedPacket($prompt);
+        $result = $this->generateCoverRedPacket($prompt, $user_id);
 
         // 返回结果
         return json($result);
     }
 
-    private function generateCoverRedPacket($prompt)
+    private function generateCoverRedPacket($prompt, $user_id)
     {
         try {
             // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
@@ -70,7 +71,7 @@ class Redpackets extends BaseController
             // ];
             // $sus = Generatedtask::Insert($data);
             if ($res) {
-                $imgdata = $this->generateImageRedPacket($res['JobId'], $prompt);
+                $imgdata = $this->generateImageRedPacket($res['JobId'], $prompt, $user_id);
                 return [
                     'code' => 1,
                     'message' => '成功',
@@ -89,7 +90,7 @@ class Redpackets extends BaseController
         }
     }
 
-    private function generateImageRedPacket($jobid, $prompt)
+    private function generateImageRedPacket($jobid, $prompt, $user_id)
     {
         try {
             // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
@@ -130,6 +131,7 @@ class Redpackets extends BaseController
                     if ($relativePath) {
                         $data = [
                             'img' => $relativePath,
+                            'user_id' => $user_id,
                             'describes' => $res['RevisedPrompt'][0],
                             'meaning' => $prompt,
                             'created_at' => date('Y-m-d H:i:s')

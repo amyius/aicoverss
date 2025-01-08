@@ -34,6 +34,8 @@ class Index extends BaseController
         $packetid = isset($params['id']) ? trim($params['id']) : 0;
         $detaillist = Redpacket::where('packetid', $packetid)->find();
         $list = Redpacket::Order('created_at desc')->select();
+        $username = User::where('id', $detaillist['user_id'])->value('name');
+        $detaillist['username'] = $username ? $username : '未知用户';
         return view('detail', ['listdetail' => $detaillist, 'list' => $list]);
     }
     //登录
