@@ -70,11 +70,12 @@ class Redpackets extends BaseController
             // ];
             // $sus = Generatedtask::Insert($data);
             if ($res) {
-                $img = $this->generateImageRedPacket($res['JobId'], $prompt);
+                $imgdata = $this->generateImageRedPacket($res['JobId'], $prompt);
                 return [
                     'code' => 1,
                     'message' => '成功',
-                    'data' => $img
+                    'img' => $imgdata['img'],
+                    'insertedId' => $imgdata['insertedId']
                 ];
             } else {
                 return [
@@ -129,14 +130,19 @@ class Redpackets extends BaseController
                     if ($relativePath) {
                         $data = [
                             'img' => $relativePath,
-                            'describes' => $prompt,
+                            'describes' => $res['RevisedPrompt'][0],
+                            'meaning' => $prompt,
                             'created_at' => date('Y-m-d H:i:s')
                         ];
                         $redpacket = new \app\model\Redpacket();
 
                         $sus = $redpacket->save($data);
-                        $insertedId = $redpacket->packetid;
                         if ($sus) {
+                            $insertedId = $redpacket->id;
+                            return [
+                                'img' => $relativePath,
+                                'insertedId' => $insertedId
+                            ];
                             break;
                         }
                     }

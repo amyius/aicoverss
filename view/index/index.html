@@ -857,9 +857,15 @@
                     prompt: $('#searchvalue').val()
                 },
                 success: function (response) {
-                    console.log("请求成功",response);
+                    console.log("请求成功", response);
+                    if (response.code == 1) {
+                        setTimeout(function () {
+                            window.location.href = "/detail/" + response.insertedId;
+                        }, 2500);
+                    }
                     $('#loading').hide();
-                    window.location.reload();
+
+                    // window.location.reload();
                 },
                 error: function (xhr, status, error) {
                     $('#loading').hide();
