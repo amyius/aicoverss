@@ -14,7 +14,7 @@ class Index extends BaseController
         $params = $this->request->param();
         $type = isset($params['type']) ? intval($params['type']) : 1;
         $describe = isset($params['describe']) ? trim($params['describe']) : '';
-        $list = Redpacket::where('type', $type);
+        $list = Redpacket::where('type', $type)->Order('created_at desc');
         if ($params) {
             if ($describe) {
                 $list->where('describes', 'like', $describe . '%');

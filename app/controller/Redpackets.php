@@ -132,7 +132,10 @@ class Redpackets extends BaseController
                             'describes' => $prompt,
                             'created_at' => date('Y-m-d H:i:s')
                         ];
-                        $sus = Redpacket::Insert($data);
+                        $redpacket = new \app\model\Redpacket();
+
+                        $sus = $redpacket->save($data);
+                        $insertedId = $redpacket->packetid;
                         if ($sus) {
                             break;
                         }
