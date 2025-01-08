@@ -19,6 +19,8 @@
   <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <!-- 引入字体图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <link rel="icon" href="/favicon.ico" />
   <title>AI 红包封面生成器 ｜ AI Cover</title>
@@ -47,22 +49,28 @@
         </div>
         <div class="accout">
           <label for="name">账号:</label>
-          <input type="text" id="name" name="name" required />
+          <input type="text" id="name" name="name" required placeholder="请输入账号" />
         </div>
         <div class="password">
           <label for="password">密码:</label>
-          <input type="password" id="password" name="password" required style="display: inline-block; width: 58%" />
-          <button type="button" id="togglePassword" class="btn btn-link">
-            显示密码
+          <!-- style="display: inline-block; width: 58%" -->
+          <input type="password" id="password" name="password" style="display: inline-block;" required
+            placeholder="请输入密码" />
+          <button type="button" id="togglePassword" class="btn btn-link"
+            style="float: right;position: relative;top: -25px;right: 25px;border: none; background-color: #fff;">
+            <i class='fa fa-eye-slash' aria-hidden='true'></i>
           </button>
         </div>
-        <input id="submit" class="submit" type="submit" value="登录" />
 
-        <div>
-          No account?
-          <a href="/register">Sign up</a>
+        <div class="logs">
+          <!-- <a href="/forgotpassword" style="float: right;">忘记密码</a> -->
+          <input id="submit" class="submit" type="submit" value="登录" />
+
+          <div>
+            No account?
+            <a href="/register">Sign up</a>
+          </div>
         </div>
-      </div>
     </form>
   </div>
 </body>
@@ -73,10 +81,10 @@
     var $passwordInput = $("#password");
     if ($passwordInput.attr("type") === "password") {
       $passwordInput.attr("type", "text");
-      $(this).text("隐藏密码");
+      $(this).html("<i class='fa fa-eye'></i>");
     } else {
       $passwordInput.attr("type", "password");
-      $(this).text("显示密码");
+      $(this).html("<i class='fa fa-eye-slash' aria-hidden='true'></i>");
     }
   });
   function setCache(key, value) {

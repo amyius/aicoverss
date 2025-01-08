@@ -84,7 +84,8 @@
                         class="text-primary">{$count}</span>
                     张使用 AI 生成的红包封面</h2>
             </section>
-            <div class="relative max-w-2xl mx-auto mt-4 md:mt-16"><input type="text" id="searchvalue"
+            <div class="relative max-w-2xl mx-auto mt-4 md:mt-16">
+                <input type="text" id="searchvalue"
                     class="mb-1 h-9 w-full rounded-md border border-solid border-primary px-3 py-6 text-sm text-[#333333] focus:border-primary"
                     placeholder="输入要生成的红包封面描述" value=""><button id="search"
                     class="relative right-0 top-[5px] w-full cursor-pointer rounded-md bg-primary border-primary px-6 py-2 text-center font-semibold text-white sm:absolute sm:right-[5px] sm:w-auto">生成封面</button>
@@ -795,7 +796,7 @@
 
         $('#logout').click(function () {
             localStorage.clear();
-            toastr.success('已注销, 即将跳转登录页');
+            toastr.success('已注销, 即将跳转首页');
             setTimeout(function () {
                 window.location.href = "/";
             }, 2500);

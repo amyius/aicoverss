@@ -89,4 +89,9 @@ class Index extends BaseController
     {
         return view('temporary');
     }
+
+    public function forgotpassword()
+    {
+        return view('forgotpassword');
+    }
 }
