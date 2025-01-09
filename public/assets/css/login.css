@@ -12,6 +12,7 @@ a {
 .forgetpassword {
   float: right;
   margin-right: -8%;
+  margin-bottom: 14px;
 }
 
 input {
@@ -64,4 +65,14 @@ input:focus {
   margin-left: 10px;
   cursor: pointer;
   display: inline-block;
+}
+
+@media only screen and (min-width: 200px) and (max-width: 767px) {
+  .signin_part {
+    width: 50% !important;
+  }
+  #togglePassword,#toggleconfirm{
+    top: -21px !important;
+  }
+
 }
