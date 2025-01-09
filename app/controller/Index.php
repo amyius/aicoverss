@@ -92,6 +92,27 @@ class Index extends BaseController
 
     public function forgotpassword()
     {
+        if ($this->request->isPost()) {
+            $data = $this->request->post();
+            if (empty($data['name']) || empty($data['password']) || empty($data['resetpassword'])) {
+                return view('forgotpassword', ['error' => '参数错误']);
+            }
+
+            $data['password'] = strtolower($data['password']);
+            $userModel = new \app\model\User();
+            $data['password'] = strtolower($data['password']);
+            $userid = $userModel->where('name', $data['name'])->order('created_at desc')->value('id');
+            if ($userid) {
+                $updatedate = [
+                    'password' => $data['password'],
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+                $userModel->where('id', $userid)->save($updatedate);
+                return json(['message' => '密码重置成功,请登录', 'code' => 1]);
+            } else {
+                return json(['message' => '密码重置失败，请稍后再试', 'code' => 0]);
+            }
+        }
         return view('forgotpassword');
     }
 }

@@ -4,6 +4,16 @@ body {
   overflow: hidden;
 }
 
+a {
+  text-decoration: none;
+  color: #0d33bf;
+}
+
+.forgetpassword {
+  float: right;
+  margin-right: -8%;
+}
+
 input {
   border: 1px solid #cccccc;
   width: 96%;
