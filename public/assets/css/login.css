@@ -68,11 +68,18 @@ input:focus {
 }
 
 @media only screen and (min-width: 300px) and (max-width: 767px) {
+  .signin {
+    width: 100%;
+    height: 100vh;
+  }
+
   .signin_part {
     width: 65% !important;
-    margin: 68% auto !important;
+    margin: 50% auto !important;
   }
-  #togglePassword,#toggleconfirm{
+
+  #togglePassword,
+  #toggleconfirm {
     top: -21px !important;
   }
 
