@@ -110,7 +110,7 @@ class Index extends BaseController
                 $userModel->where('id', $userid)->save($updatedate);
                 return json(['message' => '密码重置成功,请登录', 'code' => 1]);
             } else {
-                return json(['message' => '密码重置失败，请稍后再试', 'code' => 0]);
+                return json(['message' => '密码重置失败，或者该用户暂无账号，请稍后再试', 'code' => 0]);
             }
         }
         return view('forgotpassword');
