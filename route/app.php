@@ -19,6 +19,10 @@ Route::group('', function () {
     Route::any('/forgotpassword', 'index/forgotpassword');
 });
 
+Route::group('dowload', function () {
+    Route::any('/:imageSrc', 'download/index');
+});
+
 // http://dev.aicovers.com/aicover/aicover
 Route::group('aicover', function () {
     Route::get('/aicover', 'Aicover/aicover');

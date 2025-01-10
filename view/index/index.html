@@ -864,8 +864,10 @@
                         setTimeout(function () {
                             window.location.href = "/detail/" + response.insertedId;
                         }, 1000);
+                    } else {
+                        $('#loading').hide();
+                        toastr.error(response.msg);
                     }
-                    $('#loading').hide();
 
                     // window.location.reload();
                 },

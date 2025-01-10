@@ -115,4 +115,5 @@ class Index extends BaseController
         }
         return view('forgotpassword');
     }
+
 }
