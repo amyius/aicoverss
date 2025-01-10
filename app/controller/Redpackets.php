@@ -3,9 +3,9 @@
 namespace app\controller;
 
 use app\BaseController;
-
 use app\model\Generatedtask;
 use app\model\Redpacket;
+use app\model\Redpacketlogs;
 use TencentCloud\Common\Credential;
 use TencentCloud\Common\Profile\ClientProfile;
 use TencentCloud\Common\Profile\HttpProfile;
@@ -22,6 +22,18 @@ class Redpackets extends BaseController
         $prompt = isset($params['prompt']) ? trim($params['prompt']) : '';
         $user_id = isset($params['userid']) ? trim($params['userid']) : 0;
 
+        $limitnumber = env('CONFIG.Limitnumber');
+        // 检查用户当天生成红包封面的次数
+        $log = Redpacketlogs::where('user_id', $user_id)
+            ->where('created_at', date('Y-m-d'))
+            ->find();
+        if ($log && $log->count >= $limitnumber) {
+            return json([
+                'code' => 0,
+                'message' => "每个用户一天只能生成{$limitnumber}张红包封面",
+            ]);
+        }
+
         // 调用腾讯混元模型生成封面红包设计方案
         $result = $this->generateCoverRedPacket($prompt, $user_id);
 
@@ -33,7 +45,7 @@ class Redpackets extends BaseController
     {
         try {
             // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
-            // 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议采用更安全的方式来使用密钥，请参见：https://cloud.tencent.com/document/product/1278/85305
+            // 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议采用更安全的方式来使用密钥，请参见：https://cloud.tencent.com/document/product/1278/85305 
             // 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi 进行获取
             $SecretId = env('CONFIG.SecretId');
             $SecretKey = env('CONFIG.SecretKey');
@@ -64,13 +76,10 @@ class Redpackets extends BaseController
             // 输出json格式的字符串回包
             $res = json_decode($resp->toJsonString(), true);
 
-            // $data = [
-            //     'jobId' => $res['JobId'],
-            //     'requestId' => $res['RequestId'],
-            //     'created_at' => date('Y-m-d H:i:s', time())
-            // ];
-            // $sus = Generatedtask::Insert($data);
             if ($res) {
+                // 记录用户生成红包封面的次数
+                $this->recordUserRedpacketLog($user_id);
+
                 $imgdata = $this->generateImageRedPacket($res['JobId'], $prompt, $user_id);
                 return [
                     'code' => 1,
@@ -87,6 +96,10 @@ class Redpackets extends BaseController
             }
         } catch (TencentCloudSDKException $e) {
             error_log($e->getMessage());
+            return [
+                'code' => 0,
+                'message' => '系统错误',
+            ];
         }
     }
 
@@ -94,8 +107,8 @@ class Redpackets extends BaseController
     {
         try {
             // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
-            // 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议采用更安全的方式来使用密钥，请参见：https://cloud.tencent.com/document/product/1278/85305 
-            // 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi  进行获取
+            // 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议采用更安全的方式来使用密钥，请参见：https://cloud.tencent.com/document/product/1278/85305  
+            // 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi 进行获取
             $SecretId = env('CONFIG.SecretId');
             $SecretKey = env('CONFIG.SecretKey');
             $cred = new Credential($SecretId, $SecretKey);
@@ -113,7 +126,6 @@ class Redpackets extends BaseController
 
             $params = array(
                 'JobId' => $jobid
-
             );
             $req->fromJsonString(json_encode($params));
 
@@ -153,6 +165,10 @@ class Redpackets extends BaseController
             }
         } catch (TencentCloudSDKException $e) {
             error_log($e->getMessage());
+            return [
+                'code' => 0,
+                'message' => '系统错误',
+            ];
         }
     }
 
@@ -174,5 +190,22 @@ class Redpackets extends BaseController
 
         $relativePath = str_replace(public_path(), '', $localPath);
         return $relativePath;
+    }
+
+    private function recordUserRedpacketLog($user_id)
+    {
+        $log = Redpacketlogs::where('user_id', $user_id)
+            ->where('created_at', date('Y-m-d'))
+            ->find();
+        if ($log) {
+            $log->count += 1;
+            $log->save();
+        } else {
+            $log = new Redpacketlogs();
+            $log->user_id = $user_id;
+            $log->created_at = date('Y-m-d');
+            $log->count = 1;
+            $log->save();
+        }
     }
 }
