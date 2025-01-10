@@ -30,7 +30,7 @@ class Redpackets extends BaseController
         if ($log && $log->count >= $limitnumber) {
             return json([
                 'code' => 0,
-                'message' => "每个用户一天只能生成{$limitnumber}张红包封面",
+                'msg' => "每个用户一天只能生成{$limitnumber}张红包封面",
             ]);
         }
 
