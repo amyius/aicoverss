@@ -9,7 +9,7 @@
     <link rel="preload" as="image"
         href="https://zknown-1251007641.cos.ap-guangzhou.myqcloud.com/images/20240130090120.png">
     <link rel="preload" as="image" href="/image/hb_bottom.png">
-    <link rel="stylesheet" href="/assets/css/index.css" data-precedence="next">
+    <link rel="stylesheet" href="/assets/css/index.css" data-precedence="next" media="screen">
     <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-L50J0T914F"></script>
 
     <!-- jquery -->
@@ -851,29 +851,29 @@
         const userid = userinfo.id ? userinfo.id : 0;
         if (userid !== 0) {
             $('#loading').show();
-            $.ajax({
-                type: "POST",
-                url: "/Redpackets/redpackter",
-                data: {
-                    prompt: $('#searchvalue').val(),
-                    userid: userid
-                },
-                success: function (response) {
-                    console.log("请求成功", response);
-                    if (response.code == 1) {
-                        setTimeout(function () {
-                            window.location.href = "/detail/" + response.insertedId;
-                        }, 1000);
-                    }
-                    $('#loading').hide();
+            // $.ajax({
+            //     type: "POST",
+            //     url: "/Redpackets/redpackter",
+            //     data: {
+            //         prompt: $('#searchvalue').val(),
+            //         userid: userid
+            //     },
+            //     success: function (response) {
+            //         console.log("请求成功", response);
+            //         if (response.code == 1) {
+            //             setTimeout(function () {
+            //                 window.location.href = "/detail/" + response.insertedId;
+            //             }, 1000);
+            //         }
+            //         $('#loading').hide();
 
-                    // window.location.reload();
-                },
-                error: function (xhr, status, error) {
-                    $('#loading').hide();
-                    console.log("登录请求失败，请稍后再试");
-                },
-            });
+            //         // window.location.reload();
+            //     },
+            //     error: function (xhr, status, error) {
+            //         $('#loading').hide();
+            //         console.log("登录请求失败，请稍后再试");
+            //     },
+            // });
         } else {
             toastr.error('请先登录');
             setTimeout(function () {

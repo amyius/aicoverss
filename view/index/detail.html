@@ -870,15 +870,20 @@
 
     //下载封面
     $('#downloads').click(function () {
-
       var imageSrc = $('#imageToDownload').attr('src');
 
-      var a = document.createElement('a');
-      a.href = imageSrc;
-      a.download = 'image.jpg';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      var isAppleMobile = /iPhone|iPad|iPod/.test(navigator.userAgent);
+
+      if (isAppleMobile) {
+        window.open(imageSrc);
+      } else {
+        var a = document.createElement('a');
+        a.href = imageSrc;
+        a.download = 'image.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
     });
 
     //分享
