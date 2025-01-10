@@ -3,6 +3,7 @@
 namespace app\controller;
 
 use app\BaseController;
+use app\model\Redpacket;
 
 class Download extends BaseController
 {
@@ -31,7 +32,14 @@ class Download extends BaseController
                 'Pragma' => 'no-cache',
                 'Expires' => '0',
             ]);
+        $id = $this->request->param('id');
+        $packet = Redpacket::where('packetid', $id)->find();
+        if ($packet) {
+            $number = $packet['userdownload'] + 1;
+            Redpacket::where('packetid', $id)->update(['userdownload' => $number]);
+        }
 
         return $response;
     }
+
 }

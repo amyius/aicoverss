@@ -17,6 +17,7 @@ Route::group('', function () {
     Route::any('/detail/:id', 'index/detail');
     Route::any('/temporary', 'index/temporary');
     Route::any('/forgotpassword', 'index/forgotpassword');
+    Route::any('/downloadnumber', 'index/downloadnumber');
 });
 
 Route::group('dowload', function () {

@@ -871,7 +871,10 @@
     //下载封面
     $('#downloads').click(function () {
       var imageSrc = $('#imageToDownload').attr('src');
-
+      var url = window.location.href;
+      var urlObj = new URL(url);
+      var pathParts = urlObj.pathname.split('/');
+      var id = pathParts[pathParts.length - 1] ? id = pathParts[pathParts.length - 1] : 0;
 
       var isAppleMobile = /iPhone/.test(navigator.userAgent);
 
@@ -881,7 +884,8 @@
           type: "GET",
           url: `/download`,
           data: {
-            imageSrc: imageSrc
+            imageSrc: imageSrc,
+            id: id
           },
           xhrFields: {
             responseType: 'blob'
@@ -910,6 +914,21 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+        $.ajax({
+          type: "POST",
+          url: '/downloadnumber',
+          data: {
+            id: id
+          },
+          success: function (response) {
+            console.log('请求成功', response);
+          },
+          error: function (xhr, status, error) {
+            console.log("登录请求失败，请稍后再试");
+          },
+        });
+
       }
     });
 

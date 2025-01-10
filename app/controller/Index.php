@@ -14,19 +14,26 @@ class Index extends BaseController
         $params = $this->request->param();
         $type = isset($params['type']) ? intval($params['type']) : 1;
         $describe = isset($params['describe']) ? trim($params['describe']) : '';
-        $list = Redpacket::where('type', $type)->Order('created_at desc');
-        if ($params) {
+        $list = Redpacket::order('created_at', 'desc');
+
+        if ($this->request->isAjax()) {
             if ($describe) {
                 $list->where('describes', 'like', $describe . '%');
+            }
+            if ($type === 1) {
+            } elseif ($type === 2) {
+                $list = Redpacket::order('userdownload', 'desc');
+            } elseif ($type === 3) {
+                $list->orderRaw('RAND()')->limit(12);
             }
             $list = $list->select();
             return json(['lists' => $list]);
         }
+
         $list = $list->select();
         $count = Redpacket::count();
         return view('index', ['lists' => $list, 'count' => $count]);
     }
-
 
     public function detail()
     {
@@ -116,4 +123,18 @@ class Index extends BaseController
         return view('forgotpassword');
     }
 
+
+    //记录下载次数
+    public function downloadnumber()
+    {
+        $id = $this->request->param('id');
+        $packet = Redpacket::where('packetid', $id)->find();
+        if ($packet) {
+            $number = $packet['userdownload'] + 1;
+            Redpacket::where('packetid', $id)->update(['userdownload' => $number]);
+            return json(['code' => 1, 'message' => '下载成功']);
+        } else {
+            return json(['code' => 0, 'message' => '下载失败']);
+        }
+    }
 }
