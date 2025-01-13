@@ -21,46 +21,58 @@ class Redpackets extends BaseController
         $params = $this->request->param();
         $prompt = isset($params['prompt']) ? trim($params['prompt']) : '';
         $user_id = isset($params['userid']) ? trim($params['userid']) : 0;
+        $ip = $this->request->ip(); // 获取请求的IP地址
 
-        $limitnumber = env('CONFIG.Limitnumber');
-        // 检查用户当天生成红包封面的次数
-        $log = Redpacketlogs::where('user_id', $user_id)
-            ->where('created_at', date('Y-m-d'))
-            ->find();
-        if ($log && $log->count >= $limitnumber) {
+        $islogin = env('CONFIG.IsLogin');
+        if ($islogin && $user_id == 0) {
             return json([
                 'code' => 0,
-                'msg' => "每个用户一天只能生成{$limitnumber}张红包封面",
+                'msg' => "请先登录",
             ]);
         }
 
-        // 调用腾讯混元模型生成封面红包设计方案
-        $result = $this->generateCoverRedPacket($prompt, $user_id);
+        $limitnumber = env('CONFIG.Limitnumber');
+        // 检查用户当天生成红包封面的次数
+        // $log = Redpacketlogs::where('user_id', $user_id)
+        //     ->where('created_at', date('Y-m-d'))
+        //     ->find();
+        // if ($log && $log->count >= $limitnumber) {
+        //     return json([
+        //         'code' => 0,
+        //         'msg' => "每个用户一天只能生成{$limitnumber}张红包封面",
+        //     ]);
+        // }
 
-        // 返回结果
+        // 检查IP当天生成红包封面的次数
+        $ipLog = Redpacketlogs::where('ip', $ip)
+            ->where('created_at', date('Y-m-d'))
+            ->find();
+        if ($ipLog && $ipLog->count >= $limitnumber) {
+            return json([
+                'code' => 0,
+                'msg' => "每个IP一天只能生成{$limitnumber}张红包封面",
+            ]);
+        }
+
+        $result = $this->generateCoverRedPacket($prompt, $user_id, $ip);
+
         return json($result);
     }
 
-    private function generateCoverRedPacket($prompt, $user_id)
+    private function generateCoverRedPacket($prompt, $user_id, $ip)
     {
         try {
             // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
-            // 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议采用更安全的方式来使用密钥，请参见：https://cloud.tencent.com/document/product/1278/85305 
-            // 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi 进行获取
             $SecretId = env('CONFIG.SecretId');
             $SecretKey = env('CONFIG.SecretKey');
             $cred = new Credential($SecretId, $SecretKey);
-            // 实例化一个http选项，可选的，没有特殊需求可以跳过
             $httpProfile = new HttpProfile();
             $httpProfile->setEndpoint("hunyuan.tencentcloudapi.com");
 
-            // 实例化一个client选项，可选的，没有特殊需求可以跳过
             $clientProfile = new ClientProfile();
             $clientProfile->setHttpProfile($httpProfile);
-            // 实例化要请求产品的client对象,clientProfile是可选的
             $client = new HunyuanClient($cred, "ap-guangzhou", $clientProfile);
 
-            // 实例化一个请求对象,每个接口都会对应一个request对象
             $req = new SubmitHunyuanImageJobRequest();
 
             $params = array(
@@ -70,17 +82,16 @@ class Redpackets extends BaseController
             );
             $req->fromJsonString(json_encode($params));
 
-            // 返回的resp是一个SubmitHunyuanImageJobResponse的实例，与请求对象对应
             $resp = $client->SubmitHunyuanImageJob($req);
-
-            // 输出json格式的字符串回包
             $res = json_decode($resp->toJsonString(), true);
 
             if ($res) {
                 // 记录用户生成红包封面的次数
-                $this->recordUserRedpacketLog($user_id);
+                // $this->recordUserRedpacketLog($user_id);
+                // 记录IP生成红包封面的次数
+                $this->recordIpRedpacketLog($ip);
 
-                $imgdata = $this->generateImageRedPacket($res['JobId'], $prompt, $user_id);
+                $imgdata = $this->generateImageRedPacket($res['JobId'], $prompt, $user_id, $ip);
                 return [
                     'code' => 1,
                     'message' => '成功',
@@ -103,25 +114,19 @@ class Redpackets extends BaseController
         }
     }
 
-    private function generateImageRedPacket($jobid, $prompt, $user_id)
+    private function generateImageRedPacket($jobid, $prompt, $user_id, $ip)
     {
         try {
-            // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
-            // 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议采用更安全的方式来使用密钥，请参见：https://cloud.tencent.com/document/product/1278/85305  
-            // 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi 进行获取
             $SecretId = env('CONFIG.SecretId');
             $SecretKey = env('CONFIG.SecretKey');
             $cred = new Credential($SecretId, $SecretKey);
             $httpProfile = new HttpProfile();
             $httpProfile->setEndpoint("hunyuan.tencentcloudapi.com");
 
-            // 实例化一个client选项，可选的，没有特殊需求可以跳过
             $clientProfile = new ClientProfile();
             $clientProfile->setHttpProfile($httpProfile);
-            // 实例化要请求产品的client对象,clientProfile是可选的
             $client = new HunyuanClient($cred, "ap-guangzhou", $clientProfile);
 
-            // 实例化一个请求对象,每个接口都会对应一个request对象
             $req = new QueryHunyuanImageJobRequest();
 
             $params = array(
@@ -130,11 +135,9 @@ class Redpackets extends BaseController
             $req->fromJsonString(json_encode($params));
 
             while (true) {
-                // 返回的resp是一个QueryHunyuanImageJobResponse的实例，与请求对象对应
                 $resp = $client->QueryHunyuanImageJob($req);
                 $res = json_decode($resp->toJsonString(), true);
 
-                // 检查JobStatusCode
                 $jobStatusCode = $res['JobStatusCode'];
                 if ($jobStatusCode == 5) {
                     $imageUrl = $res['ResultImage'][0];
@@ -144,6 +147,7 @@ class Redpackets extends BaseController
                         $data = [
                             'img' => $relativePath,
                             'user_id' => $user_id,
+                            'ip' => $ip,
                             'describes' => $res['RevisedPrompt'][0],
                             'meaning' => $prompt,
                             'created_at' => date('Y-m-d H:i:s')
@@ -192,20 +196,38 @@ class Redpackets extends BaseController
         return $relativePath;
     }
 
-    private function recordUserRedpacketLog($user_id)
+    //记录每个用户生成红包封面的次数
+    // private function recordUserRedpacketLog($user_id)
+    // {
+    //     $log = Redpacketlogs::where('user_id', $user_id)
+    //         ->where('created_at', date('Y-m-d'))
+    //         ->find();
+    //     if ($log) {
+    //         $log->count += 1;
+    //         $log->save();
+    //     } else {
+    //         $log = new Redpacketlogs();
+    //         $log->user_id = $user_id;
+    //         $log->created_at = date('Y-m-d');
+    //         $log->count = 1;
+    //         $log->save();
+    //     }
+    // }
+
+    private function recordIpRedpacketLog($ip)
     {
-        $log = Redpacketlogs::where('user_id', $user_id)
+        $ipLog = Redpacketlogs::where('ip', $ip)
             ->where('created_at', date('Y-m-d'))
             ->find();
-        if ($log) {
-            $log->count += 1;
-            $log->save();
+        if ($ipLog) {
+            $ipLog->count += 1;
+            $ipLog->save();
         } else {
-            $log = new Redpacketlogs();
-            $log->user_id = $user_id;
-            $log->created_at = date('Y-m-d');
-            $log->count = 1;
-            $log->save();
+            $ipLog = new Redpacketlogs();
+            $ipLog->ip = $ip;
+            $ipLog->created_at = date('Y-m-d');
+            $ipLog->count = 1;
+            $ipLog->save();
         }
     }
 }

@@ -854,39 +854,67 @@
     $('#search').click(function () {
         var userinfo = JSON.parse(localStorage.getItem('userinfo')) ? JSON.parse(localStorage.getItem('userinfo')) : 0;
         const userid = userinfo.id ? userinfo.id : 0;
-        if (userid !== 0) {
-            $('#loading').show();
-            $.ajax({
-                type: "POST",
-                url: "/Redpackets/redpackter",
-                data: {
-                    prompt: $('#searchvalue').val(),
-                    userid: userid
-                },
-                success: function (response) {
-                    console.log("请求成功", response);
-                    if (response.code == 1) {
-                        setTimeout(function () {
-                            window.location.href = "/detail/" + response.insertedId;
-                        }, 1000);
-                    } else {
-                        $('#loading').hide();
-                        toastr.error(response.msg);
-                    }
 
-                    // window.location.reload();
-                },
-                error: function (xhr, status, error) {
+        $('#loading').show();
+        $.ajax({
+            type: "POST",
+            url: "/Redpackets/redpackter",
+            data: {
+                prompt: $('#searchvalue').val(),
+                userid: userid
+            },
+            success: function (response) {
+                console.log("请求成功", response);
+                if (response.code == 1) {
+                    setTimeout(function () {
+                        window.location.href = "/detail/" + response.insertedId;
+                    }, 1000);
+                } else {
                     $('#loading').hide();
-                    console.log("登录请求失败，请稍后再试");
-                },
-            });
-        } else {
-            toastr.error('请先登录');
-            setTimeout(function () {
-                window.location.href = "/login";
-            }, 2500);
-        }
+                    toastr.error(response.msg);
+                }
+
+                // window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                $('#loading').hide();
+                console.log("登录请求失败，请稍后再试");
+            },
+        });
+
+        // if (userid !== 0) {
+        //     $('#loading').show();
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "/Redpackets/redpackter",
+        //         data: {
+        //             prompt: $('#searchvalue').val(),
+        //             userid: userid
+        //         },
+        //         success: function (response) {
+        //             console.log("请求成功", response);
+        //             if (response.code == 1) {
+        //                 setTimeout(function () {
+        //                     window.location.href = "/detail/" + response.insertedId;
+        //                 }, 1000);
+        //             } else {
+        //                 $('#loading').hide();
+        //                 toastr.error(response.msg);
+        //             }
+
+        //             // window.location.reload();
+        //         },
+        //         error: function (xhr, status, error) {
+        //             $('#loading').hide();
+        //             console.log("登录请求失败，请稍后再试");
+        //         },
+        //     });
+        // } else {
+        //     toastr.error('请先登录');
+        //     setTimeout(function () {
+        //         window.location.href = "/login";
+        //     }, 2500);
+        // }
 
 
     });
